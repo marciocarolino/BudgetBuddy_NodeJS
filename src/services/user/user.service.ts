@@ -12,7 +12,11 @@ export class UserService {
   ) {}
 
   async findAll(): Promise<UserEntity[]> {
-    return await this.usersRepository.find();
+    return await this.usersRepository.find({
+      where: {
+        actived: true,
+      },
+    });
   }
 
   async createUser(user: userDTO): Promise<any> {
@@ -29,11 +33,28 @@ export class UserService {
     const createUser = this.usersRepository.create({
       name: user.name,
       email: user.email,
-      actived: user.actived,
+      actived: true,
       password: user.password,
       create_at: new Date(),
     });
 
     return this.usersRepository.save(createUser);
+  }
+
+  async deleteUser(id: number): Promise<any> {
+    const verifyId = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!verifyId) {
+      throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+    }
+
+    verifyId.updated_at = new Date();
+    verifyId.actived = false;
+
+    return this.usersRepository.save(verifyId);
   }
 }
