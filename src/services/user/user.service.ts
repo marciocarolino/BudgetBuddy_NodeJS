@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/entities/user.entity';
-import { userDTO } from 'src/dto/user/user.dto';
+import { updateUserDTO, userDTO } from 'src/dto/user/user.dto';
 
 @Injectable()
 export class UserService {
@@ -39,6 +39,26 @@ export class UserService {
     });
 
     return this.usersRepository.save(createUser);
+  }
+
+  async updateUser(id: number, user: updateUserDTO): Promise<any> {
+    const verifyId = await this.usersRepository.findOne({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!verifyId) {
+      throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+    }
+
+    verifyId.updated_at = new Date();
+    verifyId.actived = user.actived;
+    verifyId.name = user.name;
+    verifyId.email = user.email;
+    verifyId.actived = user.actived;
+
+    return this.usersRepository.save(verifyId);
   }
 
   async deleteUser(id: number): Promise<any> {

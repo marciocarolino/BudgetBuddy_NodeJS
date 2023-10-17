@@ -7,3 +7,9 @@ export class userDTO {
   create_at: Date;
   updated_at: Date;
 }
+
+export class updateUserDTO {
+  name: string;
+  email: string;
+  actived: boolean;
+}
